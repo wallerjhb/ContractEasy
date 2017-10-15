@@ -1,0 +1,3 @@
+# Module contracteasyclient
+# RPC service class, partial path of RPC policy file
+com.contracteasy.client.client.GreetingService, 65A7A681BF4366C29403BF76D7D8897C.gwt.rpc
