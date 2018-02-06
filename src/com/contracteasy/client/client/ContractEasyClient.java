@@ -1,9 +1,10 @@
 package com.contracteasy.client.client;
 
+import com.contracteasy.client.session.PageBuilder;
 import com.contracteasy.client.session.SessionManager;
+import com.contracteasy.client.session.page.SignUpButton;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
@@ -11,19 +12,29 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class ContractEasyClient implements EntryPoint {
 	
-	public static final String SERVER = "localhost:8080/server/";
+	public static final String SERVER = "contracteasyserver/";
+	private SessionManager session = new SessionManager();
 
 	@Override
 	public void onModuleLoad() {
-		if (RootPanel.get("signUpButtonContainer").isAttached()) {
-			SessionManager.loadButtons();
-			Window.alert("Loading buttons");
-		} else Window.alert("not loading buttons");
 		
-		if (RootPanel.get("contentContainer").isAttached()) {
-			Window.alert("loading content");
-			SessionManager.load("SignUp");
-		} else Window.alert("Not loading content");
+		String action = Window.Location.getParameter("action");
+		String user = Window.Location.getParameter("user");
+
+		RootPanel signUp = RootPanel.get("signUpButtonContainer");
+		if (signUp != null && signUp.isAttached()) {
+			PageBuilder.loadButtons(session.getLoggedInUser());
+		}
+		
+		RootPanel content = RootPanel.get("contentContainer");
+		if (content != null && content.isAttached()) {
+			PageBuilder.load(action, user);
+		}
+		
+		RootPanel loginPanel = RootPanel.get("loginContainer");
+		if (loginPanel != null && loginPanel.isAttached()) {
+			PageBuilder.loadLoginPanel(null);
+		}
 	}
 	
 	

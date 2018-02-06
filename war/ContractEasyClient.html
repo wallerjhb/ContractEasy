@@ -12,6 +12,9 @@
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
     <link type="text/css" rel="stylesheet" href="ContractEasyClient.css">
+    <link type="text/css" rel="stylesheet" href="css/skel.css" />
+	<link type="text/css" rel="stylesheet" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" href="css/style-xlarge.css" />
 
     <!--                                           -->
     <!-- Any title is fine                         -->
@@ -24,6 +27,7 @@
     <!-- be added before this line.                -->
     <!--                                           -->
     <script type="text/javascript" language="javascript" src="contracteasyclient/contracteasyclient.nocache.js"></script>
+    
   </head>
 
   <!--                                           -->
@@ -44,18 +48,15 @@
       </div>
     </noscript>
 
-    <h1>Sign Up</h1>
-
-    <table align="center">
-      <tr>
-        <td colspan="2" style="font-weight:bold;">Please enter your name:</td>        
-      </tr>
-      <tr>
-        <td id="contentContainer"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
-      </tr>
-    </table>
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="#">Contract Easy</a></h1>
+		<nav id="nav">
+			<ul>
+				<li id="loginContainer"></li>
+			</ul>
+		</nav>
+	</header>
+	
+	<div id="contentContainer"></div>
   </body>
 </html>

@@ -8,6 +8,7 @@
 <module rename-to='contracteasyclient'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.web.bindery.autobean.AutoBean"/>
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -27,6 +28,7 @@
   <source path='shared'/>
   <source path='communication'/> 
   <source path='session'/>
+  <source path='utility'/>
 
   <!-- allow Super Dev Mode -->
   <add-linker name="xsiframe"/>

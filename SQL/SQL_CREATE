@@ -1,12 +1,15 @@
+create database contracteasy;
+
 create table contracts (
 	id int, 
     userid int,
     description varchar(255));
 
 create table users (
-	usid int, 
+	usid int not null auto_increment, 
     username varchar(255), 
     password varchar(255), 
     status int, 
-	lastlogin timestamp
+	lastlogin timestamp,
+	primary key (usid)
 );
