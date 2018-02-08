@@ -2,6 +2,7 @@ package com.contracteasy.client.session.page;
 
 import com.contracteasy.client.communication.ServerCaller;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -22,8 +23,12 @@ public class DashboardPage implements Page{
 		HorizontalPanel top = new HorizontalPanel();
 		VerticalPanel contracts = new VerticalPanel();
 		
+		Label contractsHeader = new Label();
+		contractsHeader.setText("My Contracts");
+		
 		Image icon = new Image();
 		icon.setUrl("images/contractIcon.png");
+		icon.setSize("100px", "100px");
 		
 		Label label = new Label();
 	
@@ -35,8 +40,11 @@ public class DashboardPage implements Page{
 			label.setText(numContracts + " Active Contracts");
 		}
 		
+		contracts.add(contractsHeader);
 		contracts.add(icon);
 		contracts.add(label);
+		
+		contracts.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
 		top.add(contracts);
 		

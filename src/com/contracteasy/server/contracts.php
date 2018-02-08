@@ -1,5 +1,7 @@
 <?php
 
+	error_log("---------Contracts Server-----------", 0);
+
 	if (isset($_SERVER['HTTP_ORIGIN']))	{
 		header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
 		header('Access-Control-Allow-Credentials: true');
@@ -24,7 +26,7 @@
 		$con = mysql_connect("localhost:3306","root","admin");
 		
 		mysql_select_db("contracteasy");
-		$count_contracts = "SELECT COUNT(*) AS CNT FROM CONTRACTS WHERE OWNER='$user' AND STATUS=1";
+		$count_contracts = "SELECT COUNT(*) AS CNT FROM CONTRACTS WHERE USERID='$user' AND STATUS=1";
 		$result = mysql_query($count_contracts);
 		
 		if ($result == false) {
@@ -40,16 +42,11 @@
 	}
 	
 	$body = file_get_contents("php://input");
-	$decoded = json_decode(stripslashes($body), true);
-	$data = array();
-	$response = array();
-	if($decoded){
-		foreach($decoded as $key => $value) {
-			$data[$key] = $value;
-		}
+	
+	if ($_GET['r'] === 'numActive') {
+		$response = getNumberOfContracts($_GET['u']);
 	}
 	
-	if ($data['request'] === 'numActive') {
-		$response = getNumberOfContracts($data['userid']);
-	}
+	header("Content-Type: text/plain; charset=us-ascii\r\n");
+	exit($response);
 ?>

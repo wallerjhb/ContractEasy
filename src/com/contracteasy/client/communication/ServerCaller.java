@@ -27,6 +27,8 @@ public class ServerCaller {
 
 	private RequestBuilder builder;
 	private ServerRequestFactory factory = GWT.create(ServerRequestFactory.class);
+	
+	private static int contractCount;
 
 	private ServerCaller() {}
 
@@ -138,6 +140,32 @@ public class ServerCaller {
 	}
 	
 	public int contractCount(int userId) {
-		return 10;
+		
+		String url = ContractEasyClient.SERVER + "contracts.php?r=numActive&u=" + userId;
+		
+		URL.encode(url);
+
+		builder = new RequestBuilder(RequestBuilder.GET, url);
+		
+		try {
+			builder.sendRequest(null, new RequestCallback() {
+				
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {		
+						contractCount = Integer.parseInt(response.getText());
+					} else { Window.alert("Unable to login -- " + response.getStatusCode() + " " + response.getStatusText()); }					
+				}
+				
+				@Override
+				public void onError(Request request, Throwable exception) {
+					Window.alert("Unable to communicate with ContractEasy Server. Please try again later.");								
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
+		return contractCount;
 	}
 }
