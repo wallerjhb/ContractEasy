@@ -19,13 +19,16 @@
 		exit(0);
 	}
 	
-	function getNumberOfContracts($user) {
+	function getDataCount($user) {
 		
-		$num_contracts = 0;
+		error_log("Starting data count", 0);
+		
+		$data_count = array();
 		
 		$con = mysql_connect("localhost:3306","root","admin");
 		
 		mysql_select_db("contracteasy");
+		
 		$count_contracts = "SELECT COUNT(*) AS CNT FROM CONTRACTS WHERE USERID='$user' AND STATUS=1";
 		$result = mysql_query($count_contracts);
 		
@@ -33,20 +36,76 @@
 			echo "SQL query failed";
 		} else {
 			$row = mysql_fetch_array($result);
-			$num_contracts = $row['CNT'];
+			$data_count['contracts'] = $row['CNT'];
 		}
+		
+		$data_count['alerts'] = 3;
+		
+		$data_count['notices'] = 4;
 		
 		mysql_close($con);
 		
-		return $num_contracts;
+		return $data_count;
+	}
+	
+	function getContracts($user) {
+		
+		error_log("Getting contracts", 0);
+		
+		$rs = array();
+		$contracts = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		mysql_select_db("contracteasy");
+		
+		$select_contracts = "SELECT * FROM CONTRACTS WHERE USERID='$user' AND STATUS=1";
+		
+		error_log($select_contracts, 0);
+		
+		$result = mysql_query($select_contracts);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			while($row = mysql_fetch_array($result)) {
+				$contract = array();
+				$contract['id'] = $row['id'];
+				$contract['desc'] = $row['description'];
+				array_push($contracts, $contract);
+			}
+		}
+		
+		mysql_close($con);
+
+		$rs['contracts'] = $contracts;
+		return $rs;
 	}
 	
 	$body = file_get_contents("php://input");
-	
-	if ($_GET['r'] === 'numActive') {
-		$response = getNumberOfContracts($_GET['u']);
+	$decoded = json_decode(stripslashes($body), true);
+	$data = array();
+	$response = array();
+	if($decoded){
+		foreach($decoded as $key => $value) {
+			$data[$key] = $value;
+		}
 	}
 	
-	header("Content-Type: text/plain; charset=us-ascii\r\n");
-	exit($response);
+	if ($data['request'] === 'numActive') {
+		$response = getDataCount($data['userId']);
+	} else if ($data['request'] === 'getData') {
+		switch ($data['dataType']) {
+			case 'co' : $response = getContracts($data['userId']);
+			break;
+			case 'no' : $response = getNotices($data['userId']);
+			break;
+			case 'al' : $response = getAlerts($data['userId']);
+			break;
+		}
+	}
+	
+	header("Content-Type: application/json\r\n");
+	$encoded = json_encode($response);
+	exit($encoded);
 ?>

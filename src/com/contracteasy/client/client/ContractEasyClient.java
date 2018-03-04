@@ -28,7 +28,7 @@ public class ContractEasyClient implements EntryPoint {
 		
 		RootPanel content = RootPanel.get("contentContainer");
 		if (content != null && content.isAttached()) {
-			PageBuilder.load(action, user);
+			PageBuilder.load(action, Integer.parseInt(user));
 		}
 		
 		RootPanel loginPanel = RootPanel.get("loginContainer");

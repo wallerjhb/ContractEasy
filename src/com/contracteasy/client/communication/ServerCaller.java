@@ -1,13 +1,24 @@
 package com.contracteasy.client.communication;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.contracteasy.client.client.ContractEasyClient;
+import com.contracteasy.client.communication.dto.DashboardDTO;
+import com.contracteasy.client.communication.dto.DataDTO;
 import com.contracteasy.client.communication.dto.UserDTO;
+import com.contracteasy.client.communication.jsonobject.ContractJSObject;
+import com.contracteasy.client.communication.jsonobject.ContractsResponse;
+import com.contracteasy.client.communication.jsonobject.DashboardResponse;
 import com.contracteasy.client.communication.jsonobject.LoginResponse;
 import com.contracteasy.client.communication.jsonobject.SignUpResponse;
 import com.contracteasy.client.communication.dto.ServerRequestFactory;
 import com.contracteasy.client.session.PageBuilder;
 import com.contracteasy.client.session.SessionManager;
+import com.contracteasy.client.session.page.ContractsPage;
+import com.contracteasy.client.session.page.DashboardPage;
 import com.contracteasy.client.utility.Constants;
+import com.contracteasy.client.utility.Contract;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
@@ -17,6 +28,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.autobean.shared.AutoBeanUtils;
@@ -111,16 +123,16 @@ public class ServerCaller {
 							Window.alert(loginResponse.getErrorMessage());
 						} else {
 							switch (Integer.parseInt(loginResponse.getStatus())) {
-							case Constants.STATUS_ACTIVE : 
+							case Constants.USER_STATUS_ACTIVE : 
 								Window.Location.assign("ContractEasyClient.html?action=dashboard&user=" + loginResponse.getUsid());			
 								break;
-							case Constants.STATUS_NEW_USER : 
+							case Constants.USER_STATUS_NEW_USER : 
 								PageBuilder.load("new");
 								break;
-							case Constants.STATUS_AWAITING_QUOTE : 
+							case Constants.USER_STATUS_AWAITING_QUOTE : 
 								PageBuilder.load("awaitingQuote");
 								break;
-							case Constants.STATUS_QUOTE_RECEIVED : 
+							case Constants.USER_STATUS_QUOTE_RECEIVED : 
 								PageBuilder.load("quoteAccept");
 								break;
 							default : Window.alert("Loading default status " + loginResponse.getStatus());
@@ -139,33 +151,96 @@ public class ServerCaller {
 		} catch (RequestException e) { Window.alert("Couldn't retrieve JSON"); }
 	}
 	
-	public int contractCount(int userId) {
+	public void countData(final int userId) {
 		
-		String url = ContractEasyClient.SERVER + "contracts.php?r=numActive&u=" + userId;
+		String url = ContractEasyClient.SERVER + "contracts.php";
 		
 		URL.encode(url);
 
-		builder = new RequestBuilder(RequestBuilder.GET, url);
-		
+		builder = new RequestBuilder(RequestBuilder.POST, url);
+		builder.setHeader("Content-Type", "application/json");
+
 		try {
-			builder.sendRequest(null, new RequestCallback() {
+			AutoBean<DashboardDTO> dashboardDto = factory.dashboardDto();
+			
+			dashboardDto.as().setRequest("numActive");
+			dashboardDto.as().setUserId(userId);
+			
+			AutoBean<DashboardDTO> bean = AutoBeanUtils.getAutoBean(dashboardDto.as());
+			
+			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
 				
 				@Override
 				public void onResponseReceived(Request request, Response response) {
-					if (200 == response.getStatusCode()) {		
-						contractCount = Integer.parseInt(response.getText());
-					} else { Window.alert("Unable to login -- " + response.getStatusCode() + " " + response.getStatusText()); }					
+					if (200 == response.getStatusCode()) {
+						DashboardResponse dashboardResponse = JsonUtils.<DashboardResponse>safeEval(response.getText());
+						DashboardPage page = new DashboardPage(userId,
+								dashboardResponse.getContractCount(), 
+								dashboardResponse.getNoticeCount(), 
+								dashboardResponse.getAlertCount());
+						page.build(RootPanel.get("contentContainer"));
+					}
 				}
 				
 				@Override
 				public void onError(Request request, Throwable exception) {
-					Window.alert("Unable to communicate with ContractEasy Server. Please try again later.");								
+					// TODO Auto-generated method stub
+					
 				}
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 			
-		return contractCount;
+	}
+	
+	public void getData(int userId, final String type) {
+		
+		String url = ContractEasyClient.SERVER + "contracts.php";
+
+		URL.encode(url);
+
+		builder = new RequestBuilder(RequestBuilder.POST, url);
+		builder.setHeader("Content-Type", "application/json");
+		
+		try {
+			AutoBean<DataDTO> dataDto = factory.dataDto();
+			
+			dataDto.as().setRequest("getData");
+			dataDto.as().setUserId(userId);
+			dataDto.as().setDataType(type);
+			
+			AutoBean<DataDTO> bean = AutoBeanUtils.getAutoBean(dataDto.as());
+			
+			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
+				
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						switch (type) {
+						case "co" : {
+							Window.alert(response.getText());
+							ContractsResponse contractsResponse = JsonUtils.<ContractsResponse>safeEval(response.getText());
+							List<Contract> contracts = new ArrayList<Contract>();
+							
+							Window.alert(contractsResponse.getContracts().size() + "");
+							
+							ContractsPage page = new ContractsPage(contracts);
+							page.build(RootPanel.get("contentContainer"));
+						}
+						}
+					}
+				}
+				
+				@Override
+				public void onError(Request request, Throwable exception) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -6,4 +6,6 @@ import com.google.web.bindery.autobean.shared.AutoBeanFactory;
 public interface ServerRequestFactory extends AutoBeanFactory{
 
 	AutoBean<UserDTO> userDto();
+	AutoBean<DashboardDTO> dashboardDto();
+	AutoBean<DataDTO> dataDto();
 }

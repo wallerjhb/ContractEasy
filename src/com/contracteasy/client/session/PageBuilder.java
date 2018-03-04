@@ -1,6 +1,6 @@
 package com.contracteasy.client.session;
 
-import com.contracteasy.client.session.page.DashboardPage;
+import com.contracteasy.client.communication.ServerCaller;
 import com.contracteasy.client.session.page.LoginPage;
 import com.contracteasy.client.session.page.LoginPanel;
 import com.contracteasy.client.session.page.SignUpButton;
@@ -15,14 +15,14 @@ public class PageBuilder {
 	static Page currentPage;
 	
 	public static void load(String action) {
-		load(action, null, null);
+		load(action, 0, null);
 	}
 	
-	public static void load(String action, String user) {
+	public static void load(String action, int user) {
 		load(action, user, null);
 	}
 	
-	public static void load(String action, String user, String arg) {
+	public static void load(String action, int user, String arg) {
 		
 		RootPanel root = RootPanel.get("contentContainer");
 		root.clear();
@@ -39,12 +39,13 @@ public class PageBuilder {
 				break;
 			case "dashboard" : {
 				try {
-					currentPage = new DashboardPage(Integer.parseInt(user));
+					ServerCaller.getInstance().countData(user);
+					return;
 				} catch (NumberFormatException e) {Window.alert("Cannot load Dashboard");}
 			}
 				break;
-			case "contracts" :
-				break;
+			case "contracts" : ServerCaller.getInstance().getData(user, "co");
+				return;
 			case "admin" :
 				break;
 			default : break;
