@@ -72,6 +72,16 @@
 				$contract = array();
 				$contract['id'] = $row['id'];
 				$contract['desc'] = $row['description'];
+				$contract['status'] = $row['status'];
+				$contract['reference'] = $row['reference'];
+				$contract['clientref'] = $row['clientref'];
+				$contract['type'] = $row['type'];
+				$contract['counterparty'] = $row['counterparty'];
+				$contract['start'] = $row['start'];
+				$contract['termination'] = $row['termination'];
+				$contract['escalation'] = $row['escalation'];
+				$contract['renewal'] = $row['renewal'];
+				$contract['noticeperioddays'] = $row['noticeperioddays'];
 				array_push($contracts, $contract);
 			}
 		}

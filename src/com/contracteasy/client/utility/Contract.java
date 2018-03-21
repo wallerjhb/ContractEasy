@@ -1,22 +1,24 @@
 package com.contracteasy.client.utility;
 
-import java.util.Date;
-
 public class Contract {
 	
-	private int id;
-	private String reference;
-	private String description;
-	private Date startDate;
-	private Date endDate;
-	private String type;
-	private String counterParty;
-	private int status;
+	private String id = "xxxx";
+	private String reference = "xxxx";
+	private String clientRef = "xxxx";
+	private String description = "xxxx";
+	private String startDate = "xxxx";
+	private String terminationDate = "xxxx";
+	private String renewalDate = "xxxx";
+	private String escalationDate = "xxxx";
+	private String type = "xxxx";
+	private String counterParty = "xxxx";
+	private String noticePeriod = "xxxx";	
+	private String status = "xxxx";
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getReference() {
@@ -31,17 +33,17 @@ public class Contract {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public Date getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(Date startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
-	public Date getEndDate() {
-		return endDate;
+	public String getTerminationDate() {
+		return terminationDate;
 	}
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setTerminationDate(String endDate) {
+		this.terminationDate = endDate;
 	}
 	public String getType() {
 		return type;
@@ -55,10 +57,34 @@ public class Contract {
 	public void setCounterParty(String counterParty) {
 		this.counterParty = counterParty;
 	}
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getClientRef() {
+		return clientRef;
+	}
+	public void setClientRef(String clientRef) {
+		this.clientRef = clientRef;
+	}
+	public String getRenewalDate() {
+		return renewalDate;
+	}
+	public void setRenewalDate(String renewalDate) {
+		this.renewalDate = renewalDate;
+	}
+	public String getEscalationDate() {
+		return escalationDate;
+	}
+	public void setEscalationDate(String escalationDate) {
+		this.escalationDate = escalationDate;
+	}
+	public String getNoticePeriod() {
+		return noticePeriod;
+	}
+	public void setNoticePeriod(String noticePeriod) {
+		this.noticePeriod = noticePeriod;
 	}
 }

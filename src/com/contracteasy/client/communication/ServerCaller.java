@@ -1,6 +1,9 @@
 package com.contracteasy.client.communication;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.contracteasy.client.client.ContractEasyClient;
@@ -27,6 +30,11 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.autobean.shared.AutoBean;
@@ -219,11 +227,45 @@ public class ServerCaller {
 					if (200 == response.getStatusCode()) {
 						switch (type) {
 						case "co" : {
-							Window.alert(response.getText());
-							ContractsResponse contractsResponse = JsonUtils.<ContractsResponse>safeEval(response.getText());
-							List<Contract> contracts = new ArrayList<Contract>();
 							
-							Window.alert(contractsResponse.getContracts().size() + "");
+							ArrayList<Contract> contracts = new ArrayList<Contract>();
+							
+							Window.alert(response.getText());
+							JSONValue jsonValue;
+							JSONArray jsonArray;
+							JSONObject jsonObject;
+							jsonValue = JSONParser.parseStrict(response.getText());
+
+							if ((jsonObject = jsonValue.isObject()) == null) {
+							    Window.alert("Error parsing the JSON 1");
+							}
+
+							jsonValue = jsonObject.get("contracts"); 
+							if ((jsonArray = jsonValue.isArray()) == null) {
+							    Window.alert("Error parsing the JSON 2");
+							}
+							
+							try {
+								for (int i=0; i<jsonArray.size(); i++) {
+									jsonValue = jsonArray.get(i);
+									Contract contract = new Contract();
+									contract.setId(stringOrNull(jsonValue.isObject().get("id").isString()));
+									contract.setStatus(stringOrNull(jsonValue.isObject().get("status").isString()));
+									contract.setDescription(stringOrNull(jsonValue.isObject().get("desc").isString()));
+									contract.setReference(stringOrNull(jsonValue.isObject().get("reference").isString()));
+									contract.setClientRef(stringOrNull(jsonValue.isObject().get("clientref").isString()));
+									contract.setType(stringOrNull(jsonValue.isObject().get("type").isString()));
+									contract.setCounterParty(stringOrNull(jsonValue.isObject().get("counterparty").isString()));
+									contract.setNoticePeriod(stringOrNull(jsonValue.isObject().get("noticeperioddays").isString()));
+									contract.setStartDate(stringOrNull(jsonValue.isObject().get("start").isString()));
+									contract.setTerminationDate(stringOrNull(jsonValue.isObject().get("termination").isString()));
+									contract.setEscalationDate(stringOrNull(jsonValue.isObject().get("escalation").isString()));
+									contract.setRenewalDate(stringOrNull(jsonValue.isObject().get("renewal").isString()));
+									contracts.add(contract);
+								}
+							} catch (Exception e) {
+								Window.alert(e.getMessage());
+							}
 							
 							ContractsPage page = new ContractsPage(contracts);
 							page.build(RootPanel.get("contentContainer"));
@@ -242,5 +284,14 @@ public class ServerCaller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void getContractDetails(String id) {
+		
+	}
+	
+	private String stringOrNull(JSONString json) {
+		if (json != null) return json.toString().replaceAll("\"", "");
+		else return "";
 	}
 }
