@@ -3,9 +3,11 @@ package com.contracteasy.client.session.page;
 import java.util.Date;
 import java.util.List;
 
+import com.contracteasy.client.communication.ServerCaller;
 import com.contracteasy.client.utility.Constants;
 import com.contracteasy.client.utility.Contract;
 import com.google.gwt.cell.client.ButtonCell;
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -25,16 +27,24 @@ public class ContractsPage implements Page {
 
 	@Override
 	public void build(RootPanel root) {
+		root.clear();
+		
 		CellTable<Contract> table = new CellTable<Contract>();
 		
-		TextColumn<Contract> reference = new TextColumn<Contract>() {
-
+		Column<Contract, String> reference = new Column<Contract, String>(new ClickableTextCell())  {
 			@Override
-			public String getValue(Contract object) {
+			public String getValue(Contract object)  {
 				return object.getReference();
 			}
 		};
-		
+		reference.setFieldUpdater(new FieldUpdater<Contract, String>() {
+			@Override
+			public void update(int index, Contract object, String value) {
+				Window.alert("Clicking contract " + object.getDescription());
+				ServerCaller.getInstance().getDetails(Integer.parseInt(object.getId()), "co");
+			}
+		});
+			
 		TextColumn<Contract> type = new TextColumn<Contract>() {
 
 			@Override
@@ -106,7 +116,6 @@ public class ContractsPage implements Page {
 		table.addColumn(status, "Status");
 		table.addColumn(buttonColumn);
 		
-		Window.alert("Contracts size " + contracts.size());
 		table.setRowData(contracts);
 		
 		root.add(table);

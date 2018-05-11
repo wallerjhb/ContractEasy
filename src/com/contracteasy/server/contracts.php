@@ -83,6 +83,7 @@
 				$contract['renewal'] = $row['renewal'];
 				$contract['noticeperioddays'] = $row['noticeperioddays'];
 				array_push($contracts, $contract);
+				//clean up unused columns
 			}
 		}
 		
@@ -90,6 +91,119 @@
 
 		$rs['contracts'] = $contracts;
 		return $rs;
+	}
+	
+	function getNotices($user) {
+		
+		error_log("Getting notices", 0);
+		
+		$rs = array();
+		$notices = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		mysql_select_db("contracteasy");
+		
+		$select_notices = "SELECT * FROM NOTICES, CONTRACTS WHERE CONTRACTID IN (SELECT ID FROM CONTRACTS WHERE USERID='$user') AND CONTRACTS.ID = NOTICES.CONTRACTID AND NOTICES.STATUS=1";
+		
+		error_log($select_notices, 0);
+		
+		$result = mysql_query($select_notices);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			while($row = mysql_fetch_array($result)) {
+				$notice = array();
+				$notice['id'] = $row['id'];
+				$notice['desc'] = $row['description'];
+				$notice['status'] = $row['status'];
+				$notice['reference'] = $row['reference'];
+				$notice['datesent'] = $row['datesent'];
+				$notice['content'] = $row['content'];
+				$notice['counterparty'] = $row['counterparty'];				
+				array_push($notices, $notice);
+			}
+		}
+		
+		mysql_close($con);
+		
+		$rs['notices'] = $notices;
+		return $rs;
+	}
+	
+	function getAlerts($user) {
+		
+	}
+	
+	function getContractDetails($id) {
+		error_log("Getting contract details for contract $id", 0);
+		
+		$contract = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		mysql_select_db("contracteasy");
+		
+		$select_contract = "SELECT * FROM CONTRACTS WHERE ID='$id'";
+		
+		error_log($select_contract, 0);
+		
+		$result = mysql_query($select_contract);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			if (mysql_num_rows($result) >= 1) {
+				$row = mysql_fetch_array($result);
+				$contract['id'] = $row['id'];
+				$contract['desc'] = $row['description'];
+				$contract['status'] = $row['status'];
+				$contract['reference'] = $row['reference'];
+				$contract['clientref'] = $row['clientref'];
+				$contract['type'] = $row['type'];
+				$contract['counterparty'] = $row['counterparty'];
+				$contract['start'] = $row['start'];
+				$contract['termination'] = $row['termination'];
+				$contract['escalation'] = $row['escalation'];
+				$contract['renewal'] = $row['renewal'];
+				$contract['noticeperioddays'] = $row['noticeperioddays'];
+			}
+		}
+		
+		$alerts = array();
+		
+		$select_alerts = "SELECT * FROM ALERTS WHERE CONTRACTID='$id' AND STATUS=1";
+		
+		error_log($select_alerts, 0);
+		
+		$result = mysql_query($select_alerts);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			while($row = mysql_fetch_array($result)) {
+				$alert = array();
+				$alert['id'] = $row['id'];
+				$alert['type'] = $row['type'];
+				$alert['duedate'] = $row['duedate'];
+				array_push($alerts, $alert);
+			}
+		}
+		
+		$contract['alerts'] = $alerts;
+		
+		mysql_close($con);
+		
+		return $contract;
+	}
+	
+	function getNoticeDetails($id) {
+		
+	}
+	
+	function getAlertDetails($id) {
+		
 	}
 	
 	$body = file_get_contents("php://input");
@@ -102,6 +216,8 @@
 		}
 	}
 	
+	error_log("Handling request for ".$data['request'], 0);
+	
 	if ($data['request'] === 'numActive') {
 		$response = getDataCount($data['userId']);
 	} else if ($data['request'] === 'getData') {
@@ -111,6 +227,15 @@
 			case 'no' : $response = getNotices($data['userId']);
 			break;
 			case 'al' : $response = getAlerts($data['userId']);
+			break;
+		}
+	} else if ($data['request'] === 'getDetails') {
+		switch ($data['dataType']) {
+			case 'co' : $response = getContractDetails($data['id']);
+			break;
+			case 'no' : $response = getNoticeDetails($data['id']);
+			break;
+			case 'al' : $response = getAlertDetails($data['id']);
 			break;
 		}
 	}

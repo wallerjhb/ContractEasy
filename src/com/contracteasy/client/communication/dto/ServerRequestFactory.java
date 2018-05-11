@@ -8,4 +8,5 @@ public interface ServerRequestFactory extends AutoBeanFactory{
 	AutoBean<UserDTO> userDto();
 	AutoBean<DashboardDTO> dashboardDto();
 	AutoBean<DataDTO> dataDto();
+	AutoBean<DetailsDTO> detailsDto();
 }

@@ -46,6 +46,10 @@ public class PageBuilder {
 				break;
 			case "contracts" : ServerCaller.getInstance().getData(user, "co");
 				return;
+			case "alerts" : ServerCaller.getInstance().getData(user, "al");
+				return;
+			case "notices" : ServerCaller.getInstance().getData(user, "no");
+				return;
 			case "admin" :
 				break;
 			default : break;

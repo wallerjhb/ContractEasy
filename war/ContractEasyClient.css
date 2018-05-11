@@ -3,7 +3,7 @@
 
 /** Example rules used by the template application (remove for your app) */
 h1 {
-  font-size: 2em;
+  font-size: 5em;
   font-weight: bold;
   color: #777777;
   margin: 40px 0px 70px;
@@ -36,4 +36,12 @@ h1 {
 .dashboard {
 	text-align: center;
 	margin-top: 30px;
+}
+
+.dataList {
+	padding-top: 50px;
+}
+
+.dataLabel {
+	
 }

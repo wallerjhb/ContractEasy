@@ -28,6 +28,7 @@ public class DashboardPage implements Page{
 	public void build(RootPanel root) {
 		
 		HorizontalPanel top = new HorizontalPanel();
+		HorizontalPanel bottom = new HorizontalPanel();
 		VerticalPanel contracts = new VerticalPanel();
 		
 		Label contractsHeader = new Label();
@@ -68,6 +69,14 @@ public class DashboardPage implements Page{
 		alertsIcon.setUrl("images/contractIcon.png");
 		alertsIcon.setSize("250px", "250px");
 		
+		alertsIcon.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				PageBuilder.load("alerts", userId);				
+			}
+		});
+		
 		Label alertsLabel = new Label();
 	
 		if (numAlerts == 1) {
@@ -82,11 +91,49 @@ public class DashboardPage implements Page{
 		
 		alertsIcon.getElement().setAttribute("align", "center");
 		
+		VerticalPanel notices = new VerticalPanel();
+		
+		Label noticesHeader = new Label();
+		noticesHeader.setText("My notices");
+		
+		Image noticesIcon = new Image();
+		noticesIcon.setUrl("images/contractIcon.png");
+		noticesIcon.setSize("250px", "250px");
+		
+		noticesIcon.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				PageBuilder.load("notices", userId);				
+			}
+		});
+		
+		Label noticesLabel = new Label();
+	
+		if (numNotices == 1) {
+			noticesLabel.setText(numNotices + " Active Notice");
+		} else {
+			noticesLabel.setText(numNotices + " Active Notices");
+		}
+		
+		notices.add(noticesHeader);
+		notices.add(noticesIcon);
+		notices.add(noticesLabel);
+		
+		noticesIcon.getElement().setAttribute("align", "center");
+		
+		top.setStylePrimaryName("dashboard");
+		
+		
+		
 		top.setStylePrimaryName("dashboard");
 		
 		top.add(contracts);
 		top.add(alerts);
 		
+		bottom.add(notices);
+		
 		root.add(top);
+		root.add(bottom);
 	}
 }
