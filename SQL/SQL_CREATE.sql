@@ -23,6 +23,7 @@ create table users (
     password varchar(255), 
     status int, 
 	lastlogin timestamp,
+	package int,
 	primary key (usid)
 );
 
@@ -56,4 +57,20 @@ create table files (
 	name varchar(255),
 	location varchar(255),
 	primary key (id)
+);
+
+create table packages (
+	id int not null auto_increment,
+	name varchar(255),
+	max int,
+	primary key (id)
+);
+
+create table companydet (
+	user int,
+	name varchar(255),
+	contact varchar(255),
+	email varchar(255),
+	address varchar(255),
+	primary key (user)
 );

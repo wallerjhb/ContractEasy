@@ -10,11 +10,14 @@ import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class ContractsPage implements Page {
@@ -104,7 +107,12 @@ public class ContractsPage implements Page {
 		
 		buttonColumn.setFieldUpdater(new FieldUpdater<Contract, String>() {
 			  public void update(int index, Contract object, String value) {
-			    Window.alert("You clicked: " + value + " " + index);
+				  if (Integer.parseInt(object.getStatus()) == Constants.CONTRACT_STATUS_ACTIVE) {
+					  
+				  } else {
+					  //  Page uploadPopup = new UploadPage(object);
+					 //   uploadPopup.build(RootPanel.get("contentContainer"));
+				  }
 			  }
 			});
 		
@@ -114,11 +122,23 @@ public class ContractsPage implements Page {
 		table.addColumn(counterParty, "Counter Party");
 		table.addColumn(startDate, "Start Date");
 		table.addColumn(status, "Status");
-		table.addColumn(buttonColumn);
+		//table.addColumn(buttonColumn);
 		
 		table.setRowData(contracts);
 		
+		Button addContract = new Button("Add a Contract");
+		
+		addContract.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				UploadPage page = new UploadPage();
+				page.build(RootPanel.get("contentContainer"));
+			}
+		});
+		
 		root.add(table);
+		root.add(addContract);
 	}
 
 }

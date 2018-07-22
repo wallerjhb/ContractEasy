@@ -49,6 +49,9 @@
 				$login_array['errorMessage'] = '';
 				$login_array['usid'] = $row['usid'];
 				$login_array['status'] = $row['status'];
+				$login_array['pkg'] = $row['package'];
+				
+				error_log("User: id=".$row['usid']." status=".$row['status'], 0);
 			}
 		}
 		
@@ -88,7 +91,7 @@
 					$signup_array['errorCode'] = 1;
 					$signup_array['errorMessage'] = 'Username already in use. Please select a different username.';
 				} else {
-					$insert_user = "INSERT INTO USERS (USERNAME, PASSWORD, STATUS, LASTLOGIN) VALUES ('$user','$pass',0,'2000-01-01')";
+					$insert_user = "INSERT INTO USERS (USERNAME, PASSWORD, STATUS, LASTLOGIN, PACKAGE) VALUES ('$user','$pass',1,'2000-01-01',0)";
 					$result = mysql_query($insert_user);
 					if ($result == false) {
 						$signup_array['errorCode'] = 2;
@@ -103,6 +106,30 @@
 		
 		mysql_close($con);
 		return $signup_array;
+	}
+	
+	function uploadDetails($user, $companyName, $contactName, $email, $address) {
+		$details_array = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		if (mysql_errno()) {
+			echo "conn error";
+			$details_array['errorCode'] = 99998;
+		}
+		
+		mysql_select_db("contracteasy");
+		$sql = "INSERT INTO COMPANYDET (USER, NAME, CONTACT, EMAIL, ADDRESS) VALUES ('$user','$companyName','$contactName','$email','$address')";
+		$result = mysql_query($sql);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			$details_array['errorCode'] = 0;
+		}
+		
+		mysql_close($con);
+		return $details_array;
 	}
 	
 	$body = file_get_contents("php://input");
@@ -124,8 +151,13 @@
 		$response = login($data['username'], $data['password']);
 	
 	} else if ($data['request'] === 'logout') {
-		error_log("Logging user user...", 0);
+		error_log("Logging out user...", 0);
 		$response = logout($data['id']);
+		
+	} else if ($data['request'] === 'submitCompanyDetails') {
+		error_log("Uploading company details", 0);
+		$response = uploadDetails($data['user'], $data['companyName'], $data['contactName'], $data['email'], $data['physicalAddress']);
+		
 	}
 	
 	header("Content-Type: application/json\r\n");

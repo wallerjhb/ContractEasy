@@ -1,6 +1,6 @@
 package com.contracteasy.client.communication.dto;
 
-interface RequestDTO {
+public interface RequestDTO {
 
 	String request = "";
 

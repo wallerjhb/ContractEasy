@@ -7,13 +7,13 @@
 
   <!-- Servlets -->
   <servlet>
-    <servlet-name>greetServlet</servlet-name>
-    <servlet-class>com.contracteasy.client.server.GreetingServiceImpl</servlet-class>
+    <servlet-name>contracteasy</servlet-name>
+    <servlet-class>com.contracteasy.client.client.ContractEasyClient</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>greetServlet</servlet-name>
-    <url-pattern>/contracteasyclient/greet</url-pattern>
+    <servlet-name>contracteasy</servlet-name>
+    <url-pattern>/contracteasy</url-pattern>
   </servlet-mapping>
   
   <!-- Default page to serve -->

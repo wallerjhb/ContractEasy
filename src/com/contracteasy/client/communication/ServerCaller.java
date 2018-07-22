@@ -1,30 +1,31 @@
 package com.contracteasy.client.communication;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import com.contracteasy.client.client.ContractEasyClient;
+import com.contracteasy.client.communication.dto.CompanyDetailsDTO;
 import com.contracteasy.client.communication.dto.DashboardDTO;
 import com.contracteasy.client.communication.dto.DataDTO;
 import com.contracteasy.client.communication.dto.DetailsDTO;
+import com.contracteasy.client.communication.dto.RequestDTO;
 import com.contracteasy.client.communication.dto.UserDTO;
-import com.contracteasy.client.communication.jsonobject.ContractJSObject;
 import com.contracteasy.client.communication.jsonobject.ContractsResponse;
 import com.contracteasy.client.communication.jsonobject.DashboardResponse;
 import com.contracteasy.client.communication.jsonobject.LoginResponse;
+import com.contracteasy.client.communication.jsonobject.NoticesResponse;
 import com.contracteasy.client.communication.jsonobject.SignUpResponse;
 import com.contracteasy.client.communication.dto.ServerRequestFactory;
 import com.contracteasy.client.session.PageBuilder;
-import com.contracteasy.client.session.SessionManager;
 import com.contracteasy.client.session.page.ContractDetailsPage;
 import com.contracteasy.client.session.page.ContractsPage;
 import com.contracteasy.client.session.page.DashboardPage;
+import com.contracteasy.client.session.page.NoticeDetailsPage;
 import com.contracteasy.client.session.page.NoticesPage;
+import com.contracteasy.client.session.page.PackageSelectionPage;
+import com.contracteasy.client.utility.CompanyDetails;
 import com.contracteasy.client.utility.Constants;
 import com.contracteasy.client.utility.Contract;
+import com.contracteasy.client.utility.ContractPackage;
 import com.contracteasy.client.utility.Notice;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.core.shared.GWT;
@@ -51,7 +52,7 @@ public class ServerCaller {
 
 	private RequestBuilder builder;
 	private ServerRequestFactory factory = GWT.create(ServerRequestFactory.class);
-	
+
 	private static int contractCount;
 
 	private ServerCaller() {}
@@ -99,7 +100,7 @@ public class ServerCaller {
 	}
 
 	public void login(String username, String password) {
-			
+
 		if (username == null || username.equals("")) {
 			Window.alert("Please enter a valid username");
 			return;
@@ -139,16 +140,13 @@ public class ServerCaller {
 								Window.Location.assign("ContractEasyClient.html?action=dashboard&user=" + loginResponse.getUsid());			
 								break;
 							case Constants.USER_STATUS_NEW_USER : 
-								PageBuilder.load("new");
+								Window.Location.assign("ContractEasyClient.html?action=new&user=" + loginResponse.getUsid());			
 								break;
-							case Constants.USER_STATUS_AWAITING_QUOTE : 
-								PageBuilder.load("awaitingQuote");
-								break;
-							case Constants.USER_STATUS_QUOTE_RECEIVED : 
-								PageBuilder.load("quoteAccept");
+							case Constants.USER_STATUS_ADMIN :
+
 								break;
 							default : Window.alert("Loading default status " + loginResponse.getStatus());
-								break;
+							break;
 							}
 						}
 					} else { Window.alert("Unable to login -- " + response.getStatusCode() + " " + response.getStatusText()); }
@@ -162,11 +160,11 @@ public class ServerCaller {
 
 		} catch (RequestException e) { Window.alert("Couldn't retrieve JSON"); }
 	}
-	
+
 	public void countData(final int userId) {
-		
+
 		String url = ContractEasyClient.SERVER + "contracts.php";
-		
+
 		URL.encode(url);
 
 		builder = new RequestBuilder(RequestBuilder.POST, url);
@@ -174,14 +172,14 @@ public class ServerCaller {
 
 		try {
 			AutoBean<DashboardDTO> dashboardDto = factory.dashboardDto();
-			
+
 			dashboardDto.as().setRequest("numActive");
 			dashboardDto.as().setUserId(userId);
-			
+
 			AutoBean<DashboardDTO> bean = AutoBeanUtils.getAutoBean(dashboardDto.as());
-			
+
 			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
-				
+
 				@Override
 				public void onResponseReceived(Request request, Response response) {
 					if (200 == response.getStatusCode()) {
@@ -193,61 +191,61 @@ public class ServerCaller {
 						page.build(RootPanel.get("contentContainer"));
 					}
 				}
-				
+
 				@Override
 				public void onError(Request request, Throwable exception) {
 					// TODO Auto-generated method stub
-					
+
 				}
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-			
+
 	}
-	
+
 	public void getData(int userId, final String type) {
-		
+
 		String url = ContractEasyClient.SERVER + "contracts.php";
 
 		URL.encode(url);
 
 		builder = new RequestBuilder(RequestBuilder.POST, url);
 		builder.setHeader("Content-Type", "application/json");
-		
+
 		try {
 			AutoBean<DataDTO> dataDto = factory.dataDto();
-			
+
 			dataDto.as().setRequest("getData");
 			dataDto.as().setUserId(userId);
 			dataDto.as().setDataType(type);
-			
+
 			AutoBean<DataDTO> bean = AutoBeanUtils.getAutoBean(dataDto.as());
-			
+
 			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
-				
+
 				@Override
 				public void onResponseReceived(Request request, Response response) {
 					if (200 == response.getStatusCode()) {
 						switch (type) {
 						case "co" : {
-							
+
 							ArrayList<Contract> contracts = new ArrayList<Contract>();
-							
+
 							JSONValue jsonValue;
 							JSONArray jsonArray;
 							JSONObject jsonObject;
 							jsonValue = JSONParser.parseStrict(response.getText());
 
 							if ((jsonObject = jsonValue.isObject()) == null) {
-							    Window.alert("Error parsing the JSON 1");
+								Window.alert("Error parsing the JSON 1");
 							}
 
 							jsonValue = jsonObject.get("contracts"); 
 							if ((jsonArray = jsonValue.isArray()) == null) {
-							    Window.alert("Error parsing the JSON 2");
+								Window.alert("Error parsing the JSON 2");
 							}
-							
+
 							try {
 								for (int i=0; i<jsonArray.size(); i++) {
 									jsonValue = jsonArray.get(i);
@@ -269,31 +267,31 @@ public class ServerCaller {
 							} catch (Exception e) {
 								Window.alert(e.getMessage());
 							}
-							
+
 							ContractsPage page = new ContractsPage(contracts);
 							page.build(RootPanel.get("contentContainer"));
 						}
-						
-							break;
-						
+
+						break;
+
 						case "no" : {
-							
+
 							ArrayList<Notice> notices = new ArrayList<Notice>();
-							
+
 							JSONValue jsonValue;
 							JSONArray jsonArray;
 							JSONObject jsonObject;
 							jsonValue = JSONParser.parseStrict(response.getText());
 
 							if ((jsonObject = jsonValue.isObject()) == null) {
-							    Window.alert("Error parsing the JSON 1");
+								Window.alert("Error parsing the JSON 1");
 							}
 
 							jsonValue = jsonObject.get("notices"); 
 							if ((jsonArray = jsonValue.isArray()) == null) {
-							    Window.alert("Error parsing the JSON 2");
+								Window.alert("Error parsing the JSON 2");
 							}
-							
+
 							try {
 								for (int i=0; i<jsonArray.size(); i++) {
 									jsonValue = jsonArray.get(i);
@@ -309,36 +307,36 @@ public class ServerCaller {
 							} catch (Exception e) {
 								Window.alert(e.getMessage());
 							}
-							
+
 							NoticesPage page = new NoticesPage(notices);
 							page.build(RootPanel.get("contentContainer"));
 						}
-						
-							break;
-						
+
+						break;
+
 						case "al" : {
-							
+
 						}
-						
-							break;
-						
+
+						break;
+
 						default : break;
 						}
 					}
 				}
-				
+
 				@Override
 				public void onError(Request request, Throwable exception) {
 					// TODO Auto-generated method stub
-					
+
 				}
 			});
-			
+
 		} catch (Exception e) {
 			Window.alert(e.getMessage());
 		}
 	}
-	
+
 	public void getDetails(int id, final String type) {
 		String url = ContractEasyClient.SERVER + "contracts.php";
 
@@ -346,18 +344,18 @@ public class ServerCaller {
 
 		builder = new RequestBuilder(RequestBuilder.POST, url);
 		builder.setHeader("Content-Type", "application/json");
-		
+
 		try {
 			AutoBean<DetailsDTO> detailsDto = factory.detailsDto();
-			
+
 			detailsDto.as().setRequest("getDetails");
 			detailsDto.as().setId(id);
 			detailsDto.as().setDataType(type);
-			
+
 			AutoBean<DetailsDTO> bean = AutoBeanUtils.getAutoBean(detailsDto.as());
-			
+
 			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
-				
+
 				@Override
 				public void onResponseReceived(Request request, Response response) {
 					Window.alert(response.getText());
@@ -378,24 +376,31 @@ public class ServerCaller {
 								contract.setEscalationDate(contractsResponse.getEscalation());
 								contract.setRenewalDate(contractsResponse.getRenewal());
 								contract.setNoticePeriod(contractsResponse.getNoticePeriod());
-								
+
 								ContractDetailsPage page = new ContractDetailsPage(contract);
 								page.build(RootPanel.get("contentContainer"));
 							}
-								break;
+							break;
 
 							case "no": {
-								
+								NoticesResponse noticesResponse = JsonUtils.<NoticesResponse>safeEval(response.getText());
+								Notice notice = new Notice();
+								notice.setId(noticesResponse.getId());
+								notice.setStatus(noticesResponse.getStatus());
+								notice.setDescription(noticesResponse.getDesc());
+								notice.setReference(noticesResponse.getReference());
+
+								NoticeDetailsPage page = new NoticeDetailsPage(notice);
 							}
-							
-								break;
-							
+
+							break;
+
 							case "al": {
-								
+
 							}
-							
-								break;
-							
+
+							break;
+
 							default:
 								break;
 							}
@@ -404,10 +409,10 @@ public class ServerCaller {
 						Window.alert("Data reponse error " + e.getMessage());
 					}
 				}
-				
+
 				@Override
 				public void onError(Request request, Throwable exception) {
-										
+
 				}
 			});
 
@@ -415,9 +420,126 @@ public class ServerCaller {
 			Window.alert(e.getMessage());
 		}
 	}
-	
+
 	private String stringOrNull(JSONString json) {
 		if (json != null) return json.toString().replaceAll("\"", "");
 		else return "";
+	}
+
+	public void loadPackageOptions(final int user) {
+
+		Window.alert("Loading packages");
+
+		String url = ContractEasyClient.SERVER + "contracts.php";
+
+		URL.encode(url);
+
+		builder = new RequestBuilder(RequestBuilder.POST, url);
+		builder.setHeader("Content-Type", "application/json");
+
+		try {
+			AutoBean<RequestDTO> dataDto = factory.requestDTO();
+
+			dataDto.as().setRequest("getPackages");
+
+			AutoBean<RequestDTO> bean = AutoBeanUtils.getAutoBean(dataDto.as());
+
+			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					Window.alert("Response recieved with code " + response.getStatusCode() + " - " + response.getText());
+					if (200 == response.getStatusCode()) {
+
+						ArrayList<ContractPackage> packages = new ArrayList<ContractPackage>();
+
+						JSONValue jsonValue;
+						JSONArray jsonArray;
+						JSONObject jsonObject;
+						jsonValue = JSONParser.parseStrict(response.getText());
+
+						if ((jsonObject = jsonValue.isObject()) == null) {
+							Window.alert("Error parsing the JSON 1");
+						}
+
+						jsonValue = jsonObject.get("pkg"); 
+						if ((jsonArray = jsonValue.isArray()) == null) {
+							Window.alert("Error parsing the JSON 2");
+						}
+
+						try {
+							for (int i=0; i<jsonArray.size(); i++) {
+								jsonValue = jsonArray.get(i);
+								ContractPackage p = new ContractPackage();
+								p.setId(stringOrNull(jsonValue.isObject().get("id").isString()));
+								p.setName(stringOrNull(jsonValue.isObject().get("name").isString()));
+								p.setMax(stringOrNull(jsonValue.isObject().get("max").isString()));
+								packages.add(p);
+							}
+						} catch (Exception e) {
+							Window.alert(e.getMessage());
+						}
+
+						Window.alert(Integer.toString(packages.size()));
+
+						PackageSelectionPage page = new PackageSelectionPage(packages, user);
+						page.build(RootPanel.get("contentContainer"));
+					}
+
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					Window.alert("Error fetching packages");
+				}
+			});
+		} catch (Exception e) {
+			Window.alert(e.getLocalizedMessage());
+		}
+
+	}
+
+	public void submitCompanyDetails(final CompanyDetails details) {
+
+		Window.alert("Uploading company details");
+
+		String url = ContractEasyClient.SERVER + "access.php";
+
+		URL.encode(url);
+
+		builder = new RequestBuilder(RequestBuilder.POST, url);
+		builder.setHeader("Content-Type", "application/json");
+
+		try {
+			
+			AutoBean<CompanyDetailsDTO> companyDetailsDto = factory.companyDetailsDto();
+
+			companyDetailsDto.as().setRequest("submitCompanyDetails");
+			companyDetailsDto.as().setUser(Integer.toString(details.getUser()));
+			companyDetailsDto.as().setCompanyName(details.getCompanyName());
+			companyDetailsDto.as().setContactName(details.getContactName());
+			companyDetailsDto.as().setEmail(details.getEmail());
+			companyDetailsDto.as().setPhysicalAddress(details.getPhysicalAddress());
+
+			AutoBean<CompanyDetailsDTO> bean = AutoBeanUtils.getAutoBean(companyDetailsDto.as());
+
+			builder.sendRequest(AutoBeanCodex.encode(bean).getPayload(), new RequestCallback() {
+
+				@Override
+				public void onResponseReceived(Request request, Response response) {
+					if (200 == response.getStatusCode()) {
+						loadPackageOptions(details.getUser());
+					}
+				}
+
+				@Override
+				public void onError(Request request, Throwable exception) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
 	}
 }

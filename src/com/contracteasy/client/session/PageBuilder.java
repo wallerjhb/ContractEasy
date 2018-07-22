@@ -1,12 +1,14 @@
 package com.contracteasy.client.session;
 
 import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.session.page.CompanyDetailsPage;
 import com.contracteasy.client.session.page.LoginPage;
 import com.contracteasy.client.session.page.LoginPanel;
 import com.contracteasy.client.session.page.SignUpButton;
 import com.contracteasy.client.session.page.Page;
 import com.contracteasy.client.session.page.SignUpPage;
 import com.contracteasy.client.session.page.ThankYouPage;
+import com.contracteasy.client.session.page.UploadPage;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -24,6 +26,8 @@ public class PageBuilder {
 	
 	public static void load(String action, int user, String arg) {
 		
+		Window.alert("Loading page with " + action);
+		
 		RootPanel root = RootPanel.get("contentContainer");
 		root.clear();
 		
@@ -35,7 +39,7 @@ public class PageBuilder {
 				break;
 			case "login" : currentPage = new LoginPage();
 				break;
-			case "new" :
+			case "new" : currentPage = new CompanyDetailsPage(user);
 				break;
 			case "dashboard" : {
 				try {

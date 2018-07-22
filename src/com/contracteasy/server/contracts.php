@@ -29,7 +29,7 @@
 		
 		mysql_select_db("contracteasy");
 		
-		$count_contracts = "SELECT COUNT(*) AS CNT FROM CONTRACTS WHERE USERID='$user' AND STATUS=1";
+		$count_contracts = "SELECT COUNT(*) AS CNT FROM CONTRACTS WHERE USERID='$user' AND STATUS in (0,1)";
 		$result = mysql_query($count_contracts);
 		
 		if ($result == false) {
@@ -59,7 +59,7 @@
 		
 		mysql_select_db("contracteasy");
 		
-		$select_contracts = "SELECT * FROM CONTRACTS WHERE USERID='$user' AND STATUS=1";
+		$select_contracts = "SELECT * FROM CONTRACTS WHERE USERID='$user' AND STATUS in (0,1)";
 		
 		error_log($select_contracts, 0);
 		
@@ -206,6 +206,39 @@
 		
 	}
 	
+	function getPackages() {
+		error_log("Getting available packages");
+		
+		$packages = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		mysql_select_db("contracteasy");
+		
+		$select_package = "SELECT * FROM PACKAGES ORDER BY ID";
+		
+		error_log($select_package, 0);
+		
+		$result = mysql_query($select_package);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			while($row = mysql_fetch_array($result)) {
+				$package = array();
+				$package['id'] = $row['id'];
+ 				$package['name'] = $row['name'];
+				$package['max'] = $row['max'];
+				array_push($packages, $package);
+			}
+		}
+
+		mysql_close($con);
+
+		$rs['pkg'] = $packages;
+		return $rs;
+	}
+	
 	$body = file_get_contents("php://input");
 	$decoded = json_decode(stripslashes($body), true);
 	$data = array();
@@ -238,6 +271,8 @@
 			case 'al' : $response = getAlertDetails($data['id']);
 			break;
 		}
+	} else if ($data['request'] === 'getPackages') {
+		$response = getPackages();
 	}
 	
 	header("Content-Type: application/json\r\n");

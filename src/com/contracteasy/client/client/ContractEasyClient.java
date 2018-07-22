@@ -17,10 +17,10 @@ public class ContractEasyClient implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
-		
+
 		String action = Window.Location.getParameter("action");
 		String user = Window.Location.getParameter("user");
-
+		
 		RootPanel signUp = RootPanel.get("signUpButtonContainer");
 		if (signUp != null && signUp.isAttached()) {
 			PageBuilder.loadButtons(session.getLoggedInUser());
@@ -28,7 +28,11 @@ public class ContractEasyClient implements EntryPoint {
 		
 		RootPanel content = RootPanel.get("contentContainer");
 		if (content != null && content.isAttached()) {
-			PageBuilder.load(action, Integer.parseInt(user));
+			if (user != null && !user.isEmpty()) {
+				PageBuilder.load(action, Integer.parseInt(user));
+			} else {
+				PageBuilder.load(action);
+			}
 		}
 		
 		RootPanel loginPanel = RootPanel.get("loginContainer");
