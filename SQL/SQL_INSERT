@@ -1,0 +1,1 @@
+insert into packages values (1, 'Gold Package', 2, 50), (2, 'Platinum Package', 5, 100), (3, 'Diamond Package', -1, 200);

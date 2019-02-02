@@ -1,6 +1,6 @@
 package com.contracteasy.client.session.page;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -38,7 +38,7 @@ public class LoginPage implements Page {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				ServerCaller.getInstance().login(username.getText(), password.getText());				
+				AccessServerCaller.getInstance().login(username.getText(), password.getText());				
 			}
 		});
 		

@@ -1,6 +1,6 @@
 package com.contracteasy.client.session.page;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -52,7 +52,7 @@ public class SignUpPage implements Page{
 			public void onClick(ClickEvent event) {
 				if (pw.getText().equals(pwConf.getText())) {
 					//ServerCaller.getInstance().signUp(username.getText(), Md5Utils.getMd5Digest(pw.getText().getBytes()).toString());
-					ServerCaller.getInstance().signUp(username.getText(), pw.getText());
+					AccessServerCaller.getInstance().signUp(username.getText(), pw.getText());
 				} else {
 					Window.alert("Your passwords don't match. Please ensure passwords match...");
 					pw.setText("");

@@ -11,4 +11,6 @@ public interface ServerRequestFactory extends AutoBeanFactory{
 	AutoBean<DataDTO> dataDto();
 	AutoBean<DetailsDTO> detailsDto();
 	AutoBean<CompanyDetailsDTO> companyDetailsDto();
+	AutoBean<BankDetailsDTO> bankDetailsDTO();
+	AutoBean<PackageSelectionDTO> packageSelectionDto();
 }

@@ -1,6 +1,7 @@
 package com.contracteasy.client.session.page;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
+import com.contracteasy.client.communication.DetailsServerCaller;
 import com.contracteasy.client.utility.CompanyDetails;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -42,7 +43,7 @@ public class CompanyDetailsPage implements Page {
 				details.setContactName(contactPerson.getText());
 				details.setEmail(email.getText());
 				details.setPhysicalAddress(address.getText());
-				ServerCaller.getInstance().submitCompanyDetails(details);
+				DetailsServerCaller.getInstance().submitCompanyDetails(details);
 			}
 		});
 		

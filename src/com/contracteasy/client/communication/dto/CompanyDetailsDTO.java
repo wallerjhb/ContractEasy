@@ -2,14 +2,11 @@ package com.contracteasy.client.communication.dto;
 
 public interface CompanyDetailsDTO extends RequestDTO {
 	
-	String user = "";
 	String companyName = "";
 	String email = "";
 	String contactName = "";
 	String physicalAddress = "";
 
-	public String getUser();
-	public void setUser(String user);
 	public String getCompanyName();
 	public void setCompanyName(String companyName);
 	public String getEmail();

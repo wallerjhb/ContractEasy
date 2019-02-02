@@ -1,9 +1,13 @@
 package com.contracteasy.client.session;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
+import com.contracteasy.client.communication.ContractsServerCaller;
+import com.contracteasy.client.communication.DetailsServerCaller;
+import com.contracteasy.client.session.page.BankDetailsPage;
 import com.contracteasy.client.session.page.CompanyDetailsPage;
 import com.contracteasy.client.session.page.LoginPage;
 import com.contracteasy.client.session.page.LoginPanel;
+import com.contracteasy.client.session.page.PackageSelectionPage;
 import com.contracteasy.client.session.page.SignUpButton;
 import com.contracteasy.client.session.page.Page;
 import com.contracteasy.client.session.page.SignUpPage;
@@ -41,18 +45,22 @@ public class PageBuilder {
 				break;
 			case "new" : currentPage = new CompanyDetailsPage(user);
 				break;
+			case "packages" : DetailsServerCaller.getInstance().loadPackageOptions(user);
+				break;
+			case "bankDetails" : currentPage = new BankDetailsPage(user);
+				break;
 			case "dashboard" : {
 				try {
-					ServerCaller.getInstance().countData(user);
+					ContractsServerCaller.getInstance().countData(user);
 					return;
 				} catch (NumberFormatException e) {Window.alert("Cannot load Dashboard");}
 			}
 				break;
-			case "contracts" : ServerCaller.getInstance().getData(user, "co");
+			case "contracts" : ContractsServerCaller.getInstance().getData(user, "co");
 				return;
-			case "alerts" : ServerCaller.getInstance().getData(user, "al");
+			case "alerts" : ContractsServerCaller.getInstance().getData(user, "al");
 				return;
-			case "notices" : ServerCaller.getInstance().getData(user, "no");
+			case "notices" : ContractsServerCaller.getInstance().getData(user, "no");
 				return;
 			case "admin" :
 				break;
@@ -73,13 +81,16 @@ public class PageBuilder {
 		currentPage.build(root);
 	}
 	
-	public static void loadLoginPanel(SessionUser user) {
+	public static void loadLoginPanel(String user) {
 		RootPanel root = RootPanel.get("loginContainer");
 		root.clear();
 		
-		currentPage = new LoginPanel(user);
-		
-		currentPage.build(root);
+		if (user != null && !user.isEmpty()) {
+			AccessServerCaller.getInstance().loadLoginPanel(user);		
+		} else {
+			currentPage = new LoginPanel(null);
+			currentPage.build(root);
+		}
 	}
 	
 }

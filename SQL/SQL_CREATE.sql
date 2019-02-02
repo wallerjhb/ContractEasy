@@ -63,6 +63,7 @@ create table packages (
 	id int not null auto_increment,
 	name varchar(255),
 	max int,
+	price int,
 	primary key (id)
 );
 
@@ -72,5 +73,13 @@ create table companydet (
 	contact varchar(255),
 	email varchar(255),
 	address varchar(255),
+	primary key (user)
+);
+
+create table bankdet (
+	user int,
+	account varchar(255),
+	branch varchar(255),
+	name varchar(255),
 	primary key (user)
 );

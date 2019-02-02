@@ -2,6 +2,7 @@ package com.contracteasy.client.session.page;
 
 import java.util.List;
 
+import com.contracteasy.client.communication.DetailsServerCaller;
 import com.contracteasy.client.utility.ContractPackage;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -15,9 +16,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class PackageSelectionPage implements Page {
 	
 	List<ContractPackage> packages;
+	int user;
 	
 	public PackageSelectionPage(List<ContractPackage> packages, int user) {
 		this.packages = packages;
+		this.user = user;
 	}
 
 	@Override
@@ -46,6 +49,7 @@ public class PackageSelectionPage implements Page {
 				@Override
 				public void onClick(ClickEvent event) {
 					Window.alert(id);
+					DetailsServerCaller.getInstance().selectPackage(user, Integer.parseInt(id));
 				}
 			});
 			flex.setWidget(2, column++, signUp);

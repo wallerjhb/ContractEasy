@@ -1,6 +1,6 @@
 package com.contracteasy.client.session.page;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
 import com.contracteasy.client.session.SessionUser;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -26,15 +26,15 @@ public class LoginPanel implements Page{
 
 	@Override
 	public void build(RootPanel root) {
+		
+		root.clear();
+		
+		Window.alert("Loading login panel; Null user " + (user == null) ); 
+		
 		if (user == null) {
 			HorizontalPanel panel = new HorizontalPanel();
-			VerticalPanel uName = new VerticalPanel();
-			username = new TextBox();
-			uName.add(username);
-			
-			VerticalPanel pWord = new VerticalPanel();
+			username = new TextBox();	
 			password = new PasswordTextBox();
-			pWord.add(password);
 			
 			Button login = new Button("Login");
 			login.setStylePrimaryName("button special");
@@ -43,21 +43,30 @@ public class LoginPanel implements Page{
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					ServerCaller.getInstance().login(username.getText(), password.getText());
+					AccessServerCaller.getInstance().login(username.getText(), password.getText());
 				}
 			});
 			
 			HTML label = new HTML("<pre class=\"gwt-Label\">Not a member? <a href=\"ContractEasyClient.html?action=signUp\">Sign Up</a></pre>");
 			
-			panel.add(uName);
-			panel.add(pWord);
+			panel.add(username);
+			panel.add(password);
 			panel.add(login);
 			panel.add(label);
 			
 			root.add(panel);
 			
 		} else {
+			HorizontalPanel panel = new HorizontalPanel();
+			Label label = new Label("Hello, " + user.getUsername());
+			Button logOut = new Button("Logout");
+			HTML account = new HTML("<pre class=\"gwt-Label\"><a href=\"ContractEasyClient.html?action=signUp\">Manage my account</a></pre>");
 			
+			panel.add(label);
+			panel.add(logOut);
+			panel.add(account);
+			
+			root.add(panel);
 		}
 	}
 

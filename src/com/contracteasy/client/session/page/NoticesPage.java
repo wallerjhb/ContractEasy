@@ -3,7 +3,8 @@ package com.contracteasy.client.session.page;
 import java.util.Date;
 import java.util.List;
 
-import com.contracteasy.client.communication.ServerCaller;
+import com.contracteasy.client.communication.AccessServerCaller;
+import com.contracteasy.client.communication.ContractsServerCaller;
 import com.contracteasy.client.utility.Notice;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
@@ -41,7 +42,7 @@ public class NoticesPage implements Page {
 				@Override
 				public void update(int index, Notice object, String value) {
 					Window.alert("Clicking notice id: " + object.getId());
-					ServerCaller.getInstance().getDetails(Integer.parseInt(object.getId()), "no");
+					ContractsServerCaller.getInstance().getDetails(Integer.parseInt(object.getId()), "no");
 				}
 			});
 			

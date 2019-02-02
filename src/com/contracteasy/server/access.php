@@ -42,6 +42,10 @@
 		
 		if ($result == false) {
 			echo "SQL query failed";
+			$login_array['errorCode'] = 97;
+			$login_array['errorMessage'] = 'Error code 1056: please contact ContractEasy admin.';
+			$login_array['usid'] = 0;
+			$login_array['status'] = 0;
 		} else {
 			if (mysql_num_rows($result) >= 1) {
 				$row = mysql_fetch_array($result);
@@ -60,6 +64,26 @@
 		
 		mysql_close($con);
 		return $login_array;
+	}
+	
+	function getUserDetails($user) {	
+		$user_details = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		mysql_select_db("contracteasy");
+		$user_det_sql = "SELECT * FROM USERS WHERE USID='$user'";
+		$result = mysql_query($user_det_sql);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			$row = mysql_fetch_array($result);
+			$user_details['username'] = $row['username'];
+		}
+		
+		mysql_close($con);
+		return $user_details;
 	}
 	
 	function logout($id) {
@@ -125,6 +149,57 @@
 		if ($result == false) {
 			echo "SQL query failed";
 		} else {
+			$sql = "UPDATE USERS SET STATUS = 0 WHERE ID = '$user'";
+			mysql_query($sql);
+			$details_array['errorCode'] = 0;
+		}
+		
+		mysql_close($con);
+		return $details_array;
+	}
+	
+	function uploadBankDetails($user, $accountNum, $branch, $accountName) {
+		$details_array = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		if (mysql_errno()) {
+			echo "conn error";
+			$details_array['errorCode'] = 99997;
+		}
+		
+		mysql_select_db("contracteasy");
+		$sql = "INSERT INTO BANKDET (USER, ACCOUNT, BRANCH, NAME) VALUES ('$user','$accountNum','$branch','$accountName')";
+		$result = mysql_query($sql);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
+			$details_array['errorCode'] = 0;
+		}
+		
+		mysql_close($con);
+		return $details_array;
+	}
+	
+	function selectPackage($user, $pkg) {
+		$details_array = array();
+		
+		$con = mysql_connect("localhost:3306","root","admin");
+		
+		if (mysql_errno()) {
+			echo "conn error";
+			$details_array['errorCode'] = 99996;
+		}
+		
+		mysql_select_db("contracteasy");
+		$sql = "UPDATE USERS SET PACKAGE = '$pkg' WHERE USID = '$user'";
+		
+		$result = mysql_query($sql);
+		
+		if ($result == false) {
+			echo "SQL query failed";
+		} else {
 			$details_array['errorCode'] = 0;
 		}
 		
@@ -158,6 +233,13 @@
 		error_log("Uploading company details", 0);
 		$response = uploadDetails($data['user'], $data['companyName'], $data['contactName'], $data['email'], $data['physicalAddress']);
 		
+	} else if ($data['request'] === 'selectPackage') {
+		error_log("Choosing package", 0);
+		$response = selectPackage($data['user'], $data['pkg']);	
+			
+	} else if ($data['request'] === 'uploadBankDetails') {
+		error_log("Uploading bank details", 0);
+		$response = uploadBankDetails($data['user'], $data['accountNum'], $data['branch'], $data['accountName']);
 	}
 	
 	header("Content-Type: application/json\r\n");
